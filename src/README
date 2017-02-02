@@ -1,0 +1,5 @@
+timesync handles time synchronization of the blade servers.
+
+A startup script (/etc/init.d/dgc-timesync) is installed to each blade and run
+on system startup.  This script spawns the timesync daemon, which should always
+be running on every machine.
