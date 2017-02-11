@@ -228,15 +228,15 @@ void poll_master(void *userdata)
 
 static void usage()
 {
-    fprintf (stderr, "usage: ar-timesync [options]\n"
+    fprintf (stderr, "usage: hr-timesync [options]\n"
              "\n"
              "  -h, --help             shows this help text and exits\n"
              "  -v, --verbose          be verbose\n"
-             "  -p, --period <msec>    Period (in ms) to query the master"
-             "  -s, --slave            Force slave operation"
-             "  -m, --master           Force master operation"
-             "  -n, --nop              don't actually set time (for debugging timesync)"
-             "  -l, --logfile <fname>  Write output to logfile"
+             "  -p, --period <msec>    Period (in ms) to query the master\n"
+             "  -s, --slave            Force slave operation\n"
+             "  -m, --master           Force master operation\n"
+             "  -n, --nop              don't actually set time (for debugging timesync)\n"
+             "  -l, --logfile <fname>  Write output to logfile\n\n"
         );
 }
 
