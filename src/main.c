@@ -57,7 +57,8 @@ void adjust_time(double err)
         bot_timespec_now(&ts);
         bot_timespec_adjust(&ts, - err);
 #ifndef __APPLE__
-        clock_settime(CLOCK_REALTIME, &ts);
+        if (clock_settime(CLOCK_REALTIME, &ts) != 0)
+            printf("    *** Unable to set clock. Did you run as root?");
 #endif
     } 
     else
