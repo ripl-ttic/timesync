@@ -1,4 +1,4 @@
-package erlcm;
+package ripl;
 
 struct timesync_t
 {
