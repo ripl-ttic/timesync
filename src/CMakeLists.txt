@@ -8,8 +8,7 @@ target_link_libraries (timesync
 pods_use_pkg_config_packages(timesync
     lcm
     glib-2.0
-    bot2-core
-    lcmtypes_hr-lcmtypes)
+    bot2-core)
 
 # make exeutables public
 pods_install_executables(timesync)
