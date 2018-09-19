@@ -1,0 +1,5 @@
+timesync handles time synchronization of the workstations.
+
+This directory contains an init.d startup script (/etc/init.d/timesync) that
+will run on system startup.  This script spawns the timesync daemon,
+which should always be running on every machine.

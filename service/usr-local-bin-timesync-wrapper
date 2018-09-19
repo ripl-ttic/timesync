@@ -1,0 +1,27 @@
+#!/bin/bash
+
+PIDFILE="/var/run/timesync/timesync.pid"
+
+ulimit -c 1048576000
+
+# The following is a hack to make sure that the network is up
+# It should be replaced by net-device-up or similar check
+# when switching to upstart or startd
+x=0
+while ! route | grep "192." > /dev/null; do
+    if [ "$x" -gt 200 ]; then
+        #Time out here
+        exit 2
+    x=$((x+1))
+    sleep .1
+    fi
+done
+sleep 5
+
+timesync $* &
+echo $! > $PIDFILE
+
+wait
+rm -f $PIDFILE
+
+exit 0
