@@ -22,7 +22,7 @@
 #define SLAVE_ID (RAND_MAX+1LL)
 #define TIMESYNC_DEFAULT_PERIOD 1000
 
-typedef struct 
+typedef struct
 {
     lcm_t     *lcm;
     int       verbose;
@@ -49,7 +49,7 @@ typedef struct
 
 void adjust_time(double err)
 {
-    if (fabs(err) > 0.010) 
+    if (fabs(err) > 0.010)
     {
         printf("    Warping by %8.2fms", - err * 1000);
 
@@ -60,7 +60,7 @@ void adjust_time(double err)
         if (clock_settime(CLOCK_REALTIME, &ts) != 0)
             printf("    *** Unable to set clock. Did you run as root?");
 #endif
-    } 
+    }
     else
     {
         printf("    Slewing by %8.2fms", - err*1000);
@@ -134,21 +134,21 @@ int elect(state_t *state, int64_t id)
     return 0;
 }
 
-static void 
-timesync_handler(const lcm_recv_buf_t *rbuf, const char *channel, 
+static void
+timesync_handler(const lcm_recv_buf_t *rbuf, const char *channel,
                  const ripl_timesync_t *ts, void *userdata)
 {
     state_t *state = (state_t*) userdata;
 
     // update master election
-    int elected = elect(state, ts->requester_id) | 
+    int elected = elect(state, ts->requester_id) |
                   elect(state, ts->responder_id);
 
     if (elected) {
         int is_me = state->master_id == state->my_id;
 
         printf("[%"PRId64"]: new master %08x %s\n", state->last_request_send_time,
-                (int) state->master_id, 
+                (int) state->master_id,
                 is_me ? ", that's me!" : "");
 
         // if we're the master, stop any slewing that we might have been doing.
@@ -163,7 +163,7 @@ timesync_handler(const lcm_recv_buf_t *rbuf, const char *channel,
     // if we got a message from the master, remember the fact.  we use
     // this to elect new masters as
     // necessary
-    if (state->master_id == ts->responder_id || 
+    if (state->master_id == ts->responder_id ||
         state->master_id == ts->requester_id) {
         state->got_master_message = 1;
     }
@@ -191,13 +191,13 @@ timesync_handler(const lcm_recv_buf_t *rbuf, const char *channel,
 
         int64_t now = bot_timestamp_now();
         int64_t rtt = now - state->last_request_send_time;
-        int64_t err = state->last_request_send_time + 
+        int64_t err = state->last_request_send_time +
                       rtt/2 - ts->responder_utime;
 
         state->last_request_response_time = now;
-        update_time_estimate(state, 
+        update_time_estimate(state,
                 (double) err/1000000.0, (double) rtt/1000000.0);
-    } 
+    }
 }
 
 void poll_master(void *userdata)
@@ -229,7 +229,8 @@ void poll_master(void *userdata)
 
 static void usage()
 {
-    fprintf (stderr, "usage: hr-timesync [options]\n"
+    fprintf (stderr, "usage: timesync [options]\n"
+             "Timesync: Synchronizes clocks across networked machines"
              "\n"
              "  -h, --help             shows this help text and exits\n"
              "  -v, --verbose          be verbose\n"
@@ -248,9 +249,9 @@ int main(int argc, char *argv[])
     fprintf (stderr, "NOT SUPPORTED ON OSX SYSTEMS!\n");
     return -1;
 #endif
-    
+
     srand(bot_timestamp_now());
-    
+
     state_t *state = (state_t*) calloc(1, sizeof(state_t));
     state->next_nonce = rand();
     while (state->my_id == 0)
@@ -258,7 +259,7 @@ int main(int argc, char *argv[])
 
     state->master_id = SLAVE_ID;
     state->mean_rtt_gain = 0.05;
-    
+
     char *optstring = "hp:vsml:n";
     char c;
     struct option long_opts[] = {
@@ -270,13 +271,13 @@ int main(int argc, char *argv[])
         {"nop", no_argument, 0, 'n'},
         {"logfile", required_argument, 0, 'l'},
         {0, 0, 0, 0}};
-    
+
 
     state->period = TIMESYNC_DEFAULT_PERIOD;
     char *logfilename = NULL;
     while ((c = getopt_long (argc, argv, optstring, long_opts, 0)) >= 0)
     {
-        switch (c) 
+        switch (c)
         {
         case 'p':
             state->period = atoi(optarg);
@@ -358,7 +359,7 @@ int main(int argc, char *argv[])
 #endif
         if (bot_timespec_compare(&now_ts, &poll_ts) > 0) {
             poll_master(state);
-            
+
             poll_ts = now_ts;
             int interval = state->period + state->period*rand()/RAND_MAX;
             bot_timespec_addms(&poll_ts, interval);
