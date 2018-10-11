@@ -1,4 +1,4 @@
-FROM ripl/libbot:latest
+FROM ripl/libbot2:latest
 
 # set default LCM_DEFAULT_URL
 ENV LCM_DEFAULT_URL "udpm://239.255.76.67:7667?ttl=1"
