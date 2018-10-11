@@ -15,7 +15,7 @@
 
 #include <lcm/lcm.h>
 #include <bot_core/bot_core.h>
-#include <lcmtypes/ripl_timesync_t.h>
+#include <lcmtypes/timesync_ping_t.h>
 
 // if this node is forced to be a slave, it's ID will be at least this
 // big
@@ -136,7 +136,7 @@ int elect(state_t *state, int64_t id)
 
 static void
 timesync_handler(const lcm_recv_buf_t *rbuf, const char *channel,
-                 const ripl_timesync_t *ts, void *userdata)
+                 const timesync_ping_t *ts, void *userdata)
 {
     state_t *state = (state_t*) userdata;
 
@@ -173,12 +173,12 @@ timesync_handler(const lcm_recv_buf_t *rbuf, const char *channel,
 
         if (ts->responder_utime == 0) {
             // this is a request, and we're the master. send a response.
-            ripl_timesync_t resp;
+            timesync_ping_t resp;
             resp.requester_id    = ts->requester_id;
             resp.requester_nonce = ts->requester_nonce;
             resp.responder_id    = state->my_id;
             resp.responder_utime = bot_timestamp_now();
-            ripl_timesync_t_publish(state->lcm, "TIMESYNC", &resp);
+            timesync_ping_t_publish(state->lcm, "TIMESYNC", &resp);
         }
 
     } else if (ts->requester_id == state->my_id && ts->responder_utime) {
@@ -202,7 +202,7 @@ timesync_handler(const lcm_recv_buf_t *rbuf, const char *channel,
 
 void poll_master(void *userdata)
 {
-    ripl_timesync_t ts;
+    timesync_ping_t ts;
     state_t *state = (state_t*) userdata;
 
     if (state->sent_master_message == 10) {
@@ -222,7 +222,7 @@ void poll_master(void *userdata)
     state->last_request_nonce = ts.requester_nonce;
     state->last_request_send_time = bot_timestamp_now();
 
-    ripl_timesync_t_publish(state->lcm, "TIMESYNC", &ts);
+    timesync_ping_t_publish(state->lcm, "TIMESYNC", &ts);
 
     state->sent_master_message++;
 }
@@ -343,7 +343,7 @@ int main(int argc, char *argv[])
 
     if (state->verbose)
         printf("TIMESYNC: my id: %08x\n", (int) state->my_id);
-    ripl_timesync_t_subscribe( state->lcm, "TIMESYNC", timesync_handler, state );
+    timesync_ping_t_subscribe( state->lcm, "TIMESYNC", timesync_handler, state );
 
     int lcm_fd = lcm_get_fileno(state->lcm);
 
